@@ -394,24 +394,7 @@
   }
   document.getElementById('startTime').value = toLocalISO(new Date());
 
-  // Duration calculator
-  const startEl  = document.getElementById('startTime');
-  const endEl    = document.getElementById('endTime');
-  const durBadge = document.getElementById('durBadge');
-  const durText  = document.getElementById('durText');
-
-  function updateDuration() {
-    if (!startEl.value || !endEl.value) { durBadge.classList.remove('show'); return; }
-    const diff = (new Date(endEl.value) - new Date(startEl.value)) / 60000;
-    if (diff <= 0) { durBadge.classList.remove('show'); return; }
-    const h = Math.floor(diff / 60), m = Math.round(diff % 60);
-    durText.textContent = h > 0 ? `Drive duration: ${h}h ${m}min` : `Drive duration: ${m} min`;
-    durBadge.classList.add('show');
-  }
-  startEl.addEventListener('change', updateDuration);
-  endEl.addEventListener('change', updateDuration);
-
-  // File upload preview
+  // ── File upload preview
   const fileInput    = document.getElementById('licenceFile');
   const uploadZone   = document.getElementById('uploadZone');
   const previewWrap  = document.getElementById('previewWrap');
@@ -547,12 +530,21 @@
 
       const formParams = new URLSearchParams();
       Object.entries(payload).forEach(([k, v]) => formParams.append(k, v));
-      const res    = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formParams.toString()
-      });
-      const result = await res.json();
+
+      let result;
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: formParams.toString()
+        });
+        const raw = await res.text();
+        console.log('Raw response:', raw);
+        result = JSON.parse(raw);
+      } catch(fetchErr) {
+        console.error('Fetch/parse error:', fetchErr);
+        throw fetchErr;
+      }
 
       if (result.ok) {
         successTxt.textContent = `Registered — ${payload.vehicle} for ${payload.name}.`;
