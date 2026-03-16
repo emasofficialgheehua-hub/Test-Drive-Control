@@ -1,1 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Drive Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:        #0a1628;
+      --navy-card:   #0f1e36;
+      --navy-input:  #0c1a30;
+      --teal:        #00c2a8;
+      --teal-dim:    rgba(0,194,168,0.10);
+      --text-pri:    #e8edf5;
+      --text-sec:    #7a8faa;
+      --border:      rgba(0,194,168,0.18);
+      --error:       #ff5a5a;
+    }
 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--navy);
+      color: var(--text-pri);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 44px 16px 72px;
+      position: relative; overflow-x: hidden;
+    }
+
+    body::before {
+      content: ''; position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 420px;
+      background: radial-gradient(ellipse, rgba(0,194,168,0.09) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: ''; position: fixed; bottom: -200px; right: -80px;
+      width: 480px; height: 480px;
+      background: radial-gradient(ellipse, rgba(0,80,200,0.07) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .wrapper {
+      width: 100%; max-width: 620px;
+      position: relative; z-index: 1;
+      animation: fadeUp 0.55s cubic-bezier(.22,.68,0,1.2) both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* HEADER */
+    .header { text-align: center; margin-bottom: 34px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--teal-dim); border: 1px solid var(--border);
+      border-radius: 999px; padding: 5px 14px;
+      font-size: 10.5px; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 14px;
+    }
+    .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal); box-shadow: 0 0 8px var(--teal);
+      animation: blink 2.2s ease infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+    h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 40px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.1;
+    }
+    h1 span { color: var(--teal); }
+    .subtitle { margin-top: 9px; font-size: 13.5px; color: var(--text-sec); font-weight: 300; }
+
+    /* CARD */
+    .card {
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 36px 32px 32px;
+      box-shadow: 0 28px 64px rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.03);
+    }
+
+    /* SECTION LABEL */
+    .sec {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--teal);
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px;
+    }
+    .sec::after { content:''; flex:1; height:1px; background: var(--border); }
+
+    /* GRID */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid .full { grid-column: 1/-1; }
+
+    /* FORM GROUP */
+    .fg { display: flex; flex-direction: column; gap: 7px; }
+    label {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-sec);
+    }
+    label .req { color: var(--teal); margin-left: 2px; }
+
+    input, select, textarea {
+      background: var(--navy-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 14px; font-family: 'DM Sans', sans-serif;
+      color: var(--text-pri); outline: none; width: 100%;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: rgba(122,143,170,.4); }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-dim);
+      background: rgba(0,194,168,.03);
+    }
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      filter: invert(60%) sepia(60%) saturate(400%) hue-rotate(130deg);
+      cursor: pointer; opacity: .7;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%2300c2a8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 13px center;
+      padding-right: 34px; cursor: pointer;
+    }
+    select option { background: #0f1e36; color: var(--text-pri); }
+    textarea { resize: vertical; min-height: 84px; line-height: 1.6; }
+
+    /* FILE UPLOAD */
+    .upload-zone {
+      border: 1.5px dashed var(--border); border-radius: 10px;
+      padding: 22px 16px; text-align: center; cursor: pointer;
+      transition: border-color .2s, background .2s; position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag { border-color: var(--teal); background: var(--teal-dim); }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+      width: 100%; height: 100%; padding: 0; border: none; background: none;
+    }
+    .upload-icon { font-size: 26px; margin-bottom: 6px; }
+    .upload-lbl { font-size: 13px; color: var(--text-sec); }
+    .upload-lbl strong { color: var(--teal); font-weight: 500; }
+    .upload-hint { font-size: 11px; color: rgba(122,143,170,.45); margin-top: 4px; }
+
+    .preview-wrap {
+      display: none; align-items: center; gap: 12px;
+      background: var(--teal-dim); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px; margin-top: 10px;
+    }
+    .preview-wrap.show { display: flex; }
+    .preview-thumb { width: 46px; height: 36px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); }
+    .preview-info { flex:1; overflow:hidden; }
+    .preview-name { font-size: 13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .preview-size { font-size: 11px; color: var(--text-sec); margin-top: 2px; }
+    .preview-remove { background:none; border:none; color:var(--error); cursor:pointer; font-size:18px; padding:2px 4px; line-height:1; flex-shrink:0; }
+
+    .up-prog { height:3px; background:var(--border); border-radius:999px; margin-top:8px; overflow:hidden; display:none; }
+    .up-prog.show { display:block; }
+    .up-bar { height:100%; background:var(--teal); border-radius:999px; width:0%; transition:width .3s ease; }
+
+    /* Licence required indicator */
+    .licence-label-wrap { display:flex; align-items:center; gap:8px; }
+    .licence-req-badge {
+      display: none;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      background: rgba(255,90,90,0.12); color: var(--error);
+      border: 1px solid rgba(255,90,90,0.3); border-radius: 5px;
+      padding: 2px 7px; animation: fadeUp .25s ease;
+    }
+    .licence-req-badge.show { display: inline-block; }
+    .upload-zone.required-error {
+      border-color: var(--error) !important;
+      box-shadow: 0 0 0 3px rgba(255,90,90,0.1);
+    }
+    .upload-zone.required-error .upload-lbl strong { color: var(--error); }
+    .upload-zone.required-error .upload-icon { filter: grayscale(0.3); }
+
+    /* DIVIDER */
+    .divider { margin: 26px 0; height: 1px; background: var(--border); }
+
+    /* DURATION BADGE */
+    .dur-badge {
+      display: none; align-items: center; gap: 7px;
+      background: var(--teal-dim); border: 1px solid var(--border);
+      border-radius: 8px; padding: 7px 12px;
+      font-size: 12.5px; color: var(--teal);
+    }
+    .dur-badge.show { display: flex; }
+
+    /* SUBMIT */
+    .btn-submit {
+      width: 100%; background: var(--teal); color: var(--navy);
+      border: none; border-radius: 12px; padding: 15px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: opacity .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 22px rgba(0,194,168,.24); margin-top: 6px;
+    }
+    .btn-submit:hover:not(:disabled) { opacity:.9; transform:translateY(-1px); box-shadow:0 8px 32px rgba(0,194,168,.36); }
+    .btn-submit:active:not(:disabled) { transform:translateY(0); }
+    .btn-submit:disabled { opacity:.45; cursor:not-allowed; }
+
+    /* MESSAGES */
+    .msg {
+      margin-top: 16px; padding: 13px 16px; border-radius: 10px;
+      font-size: 13.5px; font-weight: 500;
+      display: none; align-items: flex-start; gap: 10px;
+    }
+    .msg.show { display: flex; animation: fadeUp .3s ease; }
+    .msg-icon { font-size: 17px; flex-shrink:0; margin-top:1px; }
+    .msg.success { background:rgba(0,194,168,.09); color:var(--teal); border:1px solid rgba(0,194,168,.28); }
+    .msg.error   { background:rgba(255,90,90,.08); color:var(--error); border:1px solid rgba(255,90,90,.24); }
+
+    /* FOOTER */
+    .footer { text-align:center; margin-top:22px; font-size:11.5px; color:rgba(122,143,170,.38); letter-spacing:.05em; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display:inline-block; width:15px; height:15px;
+      border:2px solid rgba(10,22,40,.35); border-top-color:var(--navy);
+      border-radius:50%; animation:spin .65s linear infinite;
+      vertical-align:middle; margin-right:7px;
+    }
+
+    @media (max-width: 520px) {
+      .card { padding: 26px 18px 24px; }
+      .grid { grid-template-columns: 1fr; }
+      .grid .full { grid-column: 1; }
+      h1 { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <div class="badge"><span class="badge-dot"></span>Showroom System</div>
+    <h1>Test Drive <span>Registration</span></h1>
+    <p class="subtitle">Internal log for showroom test drives and vehicle usage</p>
+  </div>
+
+  <div class="card">
+    <form id="tdForm">
+
+      <!-- VEHICLE & USAGE -->
+      <div class="sec">Vehicle &amp; Usage</div>
+      <div class="grid">
+
+        <div class="fg full">
+          <label for="usageType">Usage Type <span class="req">*</span></label>
+          <select id="usageType" required>
+            <option value="" disabled selected>Select usage type</option>
+            <option value="Customer Test Drive">Customer Test Drive</option>
+            <option value="Internal Use">Internal Use</option>
+          </select>
+        </div>
+
+        <div class="fg full">
+          <label for="vehicle">Vehicle <span class="req">*</span></label>
+          <select id="vehicle" required>
+            <option value="" disabled selected>Select vehicle</option>
+            <optgroup label="Proton">
+              <option value="Proton e.MAS 7 EV">Proton e.MAS 7 EV</option>
+              <option value="Proton e.MAS 7 PHEV">Proton e.MAS 7 PHEV</option>
+              <option value="Proton e.MAS 5">Proton e.MAS 5</option>
+            </optgroup>
+            <optgroup label="smart">
+              <option value="smart #1">smart #1</option>
+              <option value="smart #3">smart #3</option>
+              <option value="smart #5">smart #5</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="fg full">
+          <label for="salesSpecialist">Sales Specialist <span class="req">*</span></label>
+          <select id="salesSpecialist" required>
+            <option value="" disabled selected>Select sales specialist</option>
+            <option value="Michelle Ann Anak Charles">Michelle Ann Anak Charles</option>
+            <option value="Nur Ainun Affifah Binti Taip">Nur Ainun Affifah Binti Taip</option>
+            <option value="Sharman Shaiful">Sharman Shaiful</option>
+            <option value="Mohammad Arifin">Mohammad Arifin</option>
+            <option value="Faqihah">Faqihah</option>
+            <option value="Jack Leong">Jack Leong</option>
+            <option value="Contessa Kupak">Contessa Kupak</option>
+            <option value="Kevin Ong">Kevin Ong</option>
+            <option value="Hafizul Nizam">Hafizul Nizam</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- CUSTOMER DETAILS -->
+      <div class="sec">Customer Details</div>
+      <div class="grid">
+
+        <div class="fg">
+          <label for="name">Name <span class="req">*</span></label>
+          <input id="name" type="text" placeholder="Full name" required />
+        </div>
+
+        <div class="fg">
+          <label for="phone">Phone <span class="req">*</span></label>
+          <input id="phone" type="tel" placeholder="e.g. 0123456789" required />
+        </div>
+
+        <div class="fg full" id="licenceFg">
+          <label>
+            <span class="licence-label-wrap">
+              Driving Licence Photo
+              <span class="licence-req-badge" id="licenceReqBadge">Required for Customer Test Drive</span>
+            </span>
+          </label>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="licenceFile" accept="image/*,application/pdf" />
+            <div class="upload-icon">📄</div>
+            <div class="upload-lbl"><strong>Tap to upload</strong> or drag &amp; drop</div>
+            <div class="upload-hint">JPG, PNG or PDF · max 5 MB</div>
+          </div>
+          <div class="preview-wrap" id="previewWrap">
+            <img class="preview-thumb" id="previewThumb" src="" alt="" />
+            <div class="preview-info">
+              <div class="preview-name" id="previewName"></div>
+              <div class="preview-size" id="previewSize"></div>
+            </div>
+            <button type="button" class="preview-remove" id="removeFile">✕</button>
+          </div>
+          <div class="up-prog" id="upProg"><div class="up-bar" id="upBar"></div></div>
+        </div>
+
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- DRIVE TIMING -->
+      <div class="sec">Drive Timing</div>
+      <div class="grid">
+
+        <div class="fg">
+          <label for="startTime">Departure Time <span class="req">*</span></label>
+          <input type="datetime-local" id="startTime" required />
+        </div>
+
+        <div class="fg">
+          <label for="endTime">Return Time</label>
+          <input type="datetime-local" id="endTime" />
+        </div>
+
+        <div class="dur-badge full" id="durBadge">
+          <span>⏱</span><span id="durText"></span>
+        </div>
+
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- NOTES -->
+      <div class="sec">Notes</div>
+      <div class="fg">
+        <label for="notes">Purpose / Notes</label>
+        <textarea id="notes" placeholder="e.g. customer requested short city route, staff demo run…"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">Submit Registration</button>
+    </form>
+
+    <div class="msg success" id="successMsg"><span class="msg-icon">✓</span><span id="successTxt"></span></div>
+    <div class="msg error"   id="errorMsg">  <span class="msg-icon">!</span><span id="errorTxt"></span></div>
+  </div>
+
+  <div class="footer">Proton e.MAS 3S Ghee Hua — Kuching, Sarawak</div>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDdP3X2PMzoPDwtEhccHxvEUj256Y5ufqk7QQoMhqeOSIursLlgMZFjqq0xpznXNjDqw/exec";
+
+  // Default start time = now
+  function toLocalISO(d) {
+    const p = n => String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  }
+  document.getElementById('startTime').value = toLocalISO(new Date());
+
+  // Duration calculator
+  const startEl  = document.getElementById('startTime');
+  const endEl    = document.getElementById('endTime');
+  const durBadge = document.getElementById('durBadge');
+  const durText  = document.getElementById('durText');
+
+  function updateDuration() {
+    if (!startEl.value || !endEl.value) { durBadge.classList.remove('show'); return; }
+    const diff = (new Date(endEl.value) - new Date(startEl.value)) / 60000;
+    if (diff <= 0) { durBadge.classList.remove('show'); return; }
+    const h = Math.floor(diff / 60), m = Math.round(diff % 60);
+    durText.textContent = h > 0 ? `Drive duration: ${h}h ${m}min` : `Drive duration: ${m} min`;
+    durBadge.classList.add('show');
+  }
+  startEl.addEventListener('change', updateDuration);
+  endEl.addEventListener('change', updateDuration);
+
+  // File upload preview
+  const fileInput    = document.getElementById('licenceFile');
+  const uploadZone   = document.getElementById('uploadZone');
+  const previewWrap  = document.getElementById('previewWrap');
+  const previewThumb = document.getElementById('previewThumb');
+  const previewName  = document.getElementById('previewName');
+  const previewSize  = document.getElementById('previewSize');
+  const removeBtn    = document.getElementById('removeFile');
+  const licenceReqBadge = document.getElementById('licenceReqBadge');
+  let selectedFile   = null;
+  let licenceRequired = false;
+
+  // Show/hide required badge when usage type changes
+  document.getElementById('usageType').addEventListener('change', function() {
+    licenceRequired = this.value === 'Customer Test Drive';
+    licenceReqBadge.classList.toggle('show', licenceRequired);
+    // Clear any existing error state if file already uploaded
+    if (selectedFile) uploadZone.classList.remove('required-error');
+  });
+
+  function showPreview(file) {
+    if (file.size > 5 * 1024 * 1024) { alert('File too large. Max 5 MB.'); return; }
+    selectedFile = file;
+    uploadZone.classList.remove('required-error');
+    previewName.textContent = file.name;
+    previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+    if (file.type.startsWith('image/')) {
+      const r = new FileReader();
+      r.onload = e => { previewThumb.src = e.target.result; previewThumb.style.display = 'block'; };
+      r.readAsDataURL(file);
+    } else {
+      previewThumb.style.display = 'none';
+    }
+    previewWrap.classList.add('show');
+    uploadZone.style.display = 'none';
+  }
+
+  function clearFile() {
+    selectedFile = null; fileInput.value = ''; previewThumb.src = '';
+    previewWrap.classList.remove('show'); uploadZone.style.display = 'block';
+  }
+
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) showPreview(fileInput.files[0]); });
+  removeBtn.addEventListener('click', clearFile);
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault(); uploadZone.classList.remove('drag');
+    if (e.dataTransfer.files[0]) showPreview(e.dataTransfer.files[0]);
+  });
+
+  // Upload file to Google Drive
+  async function uploadToDrive(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const base64 = e.target.result.split(',')[1];
+        const prog = document.getElementById('upProg');
+        const bar  = document.getElementById('upBar');
+        prog.classList.add('show');
+        let pct = 0;
+        const tick = setInterval(() => { pct = Math.min(pct + 7, 82); bar.style.width = pct + '%'; }, 130);
+        try {
+          const uploadParams = new URLSearchParams();
+          uploadParams.append('action', 'uploadFile');
+          uploadParams.append('fileName', file.name);
+          uploadParams.append('mimeType', file.type);
+          uploadParams.append('base64Data', base64);
+          const res  = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: uploadParams.toString()
+          });
+          const data = await res.json();
+          clearInterval(tick); bar.style.width = '100%';
+          setTimeout(() => { prog.classList.remove('show'); bar.style.width = '0%'; }, 500);
+          data.ok ? resolve(data.fileUrl || '') : reject(data.message || 'Upload failed');
+        } catch(err) {
+          clearInterval(tick); prog.classList.remove('show'); reject(err.message);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Form submit
+  const form      = document.getElementById('tdForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const successMsg = document.getElementById('successMsg');
+  const errorMsg   = document.getElementById('errorMsg');
+  const successTxt = document.getElementById('successTxt');
+  const errorTxt   = document.getElementById('errorTxt');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    successMsg.classList.remove('show');
+    errorMsg.classList.remove('show');
+
+    // Validate licence upload for Customer Test Drive
+    if (licenceRequired && !selectedFile) {
+      uploadZone.classList.add('required-error');
+      uploadZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      errorTxt.textContent = 'Driving licence photo is required for Customer Test Drive.';
+      errorMsg.classList.add('show');
+      return;
+    }
+
+    submitBtn.disabled = true;
+
+    let licenceLink = '';
+
+    try {
+      if (selectedFile) {
+        submitBtn.innerHTML = '<span class="spinner"></span>Uploading licence…';
+        try { licenceLink = await uploadToDrive(selectedFile); }
+        catch(err) { licenceLink = 'Upload failed'; }
+      }
+
+      submitBtn.innerHTML = '<span class="spinner"></span>Saving record…';
+
+      const payload = {
+        action:          'submitForm',
+        usageType:       document.getElementById('usageType').value,
+        name:            document.getElementById('name').value.trim(),
+        phone:           document.getElementById('phone').value.trim(),
+        vehicle:         document.getElementById('vehicle').value,
+        salesSpecialist: document.getElementById('salesSpecialist').value,
+        notes:           document.getElementById('notes').value.trim(),
+        startTime:       document.getElementById('startTime').value,
+        endTime:         document.getElementById('endTime').value,
+        licenceLink
+      };
+
+      const formParams = new URLSearchParams();
+      Object.entries(payload).forEach(([k, v]) => formParams.append(k, v));
+      const res    = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formParams.toString()
+      });
+      const result = await res.json();
+
+      if (result.ok) {
+        const dur = durBadge.classList.contains('show') ? ` · ${durText.textContent}` : '';
+        successTxt.textContent = `Registered — ${payload.vehicle} for ${payload.name}${dur}.`;
+        successMsg.classList.add('show');
+        form.reset(); clearFile(); durBadge.classList.remove('show');
+        document.getElementById('startTime').value = toLocalISO(new Date());
+      } else {
+        errorTxt.textContent = result.message || 'Submission failed. Please try again.';
+        errorMsg.classList.add('show');
+      }
+    } catch(err) {
+      errorTxt.textContent = 'Unable to reach the server. Check your connection and try again.';
+      errorMsg.classList.add('show');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Submit Registration';
+    }
+  });
+</script>
+</body>
+</html>
