@@ -281,6 +281,16 @@
           </select>
         </div>
 
+        <div class="fg">
+          <label for="variant">Variant</label>
+          <input id="variant" type="text" placeholder="e.g. Premium, Standard" />
+        </div>
+
+        <div class="fg">
+          <label for="carPlate">Car Plate</label>
+          <input id="carPlate" type="text" placeholder="e.g. QR 1234 A" />
+        </div>
+
         <div class="fg full">
           <label for="salesSpecialist">Sales Specialist <span class="req">*</span></label>
           <select id="salesSpecialist" required>
@@ -348,18 +358,9 @@
       <div class="sec">Drive Timing</div>
       <div class="grid">
 
-        <div class="fg">
+        <div class="fg full">
           <label for="startTime">Departure Time <span class="req">*</span></label>
           <input type="datetime-local" id="startTime" required />
-        </div>
-
-        <div class="fg">
-          <label for="endTime">Return Time</label>
-          <input type="datetime-local" id="endTime" />
-        </div>
-
-        <div class="dur-badge full" id="durBadge">
-          <span>⏱</span><span id="durText"></span>
         </div>
 
       </div>
@@ -384,7 +385,7 @@
 </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDdP3X2PMzoPDwtEhccHxvEUj256Y5ufqk7QQoMhqeOSIursLlgMZFjqq0xpznXNjDqw/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxan8pfWx3P2KOFnaqvTqR_Bfc69y_BCmkt9vz1lDionu6IxRqOl1f4GKAe25i09WgvYQ/exec";
 
   // Default start time = now
   function toLocalISO(d) {
@@ -536,10 +537,11 @@
         name:            document.getElementById('name').value.trim(),
         phone:           document.getElementById('phone').value.trim(),
         vehicle:         document.getElementById('vehicle').value,
+        variant:         document.getElementById('variant').value.trim(),
+        carPlate:        document.getElementById('carPlate').value.trim(),
         salesSpecialist: document.getElementById('salesSpecialist').value,
-        notes:           document.getElementById('notes').value.trim(),
         startTime:       document.getElementById('startTime').value,
-        endTime:         document.getElementById('endTime').value,
+        notes:           document.getElementById('notes').value.trim(),
         licenceLink
       };
 
@@ -553,10 +555,9 @@
       const result = await res.json();
 
       if (result.ok) {
-        const dur = durBadge.classList.contains('show') ? ` · ${durText.textContent}` : '';
-        successTxt.textContent = `Registered — ${payload.vehicle} for ${payload.name}${dur}.`;
+        successTxt.textContent = `Registered — ${payload.vehicle} for ${payload.name}.`;
         successMsg.classList.add('show');
-        form.reset(); clearFile(); durBadge.classList.remove('show');
+        form.reset(); clearFile();
         document.getElementById('startTime').value = toLocalISO(new Date());
       } else {
         errorTxt.textContent = result.message || 'Submission failed. Please try again.';
