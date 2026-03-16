@@ -282,17 +282,22 @@
         </div>
 
         <div class="fg">
-          <label for="variant">Variant</label>
-          <input id="variant" type="text" placeholder="e.g. Premium, Standard" />
+          <label for="variant">Variant <span class="req">*</span></label>
+          <select id="variant" required>
+            <option value="" disabled selected>Select variant</option>
+            <option value="Prime">Prime</option>
+            <option value="Premium">Premium</option>
+            <option value="BRABUS">BRABUS</option>
+          </select>
         </div>
 
         <div class="fg">
-          <label for="carPlate">Car Plate</label>
-          <input id="carPlate" type="text" placeholder="e.g. QR 1234 A" />
+          <label for="carPlate">Car Plate <span class="req">*</span></label>
+          <input id="carPlate" type="text" placeholder="e.g. QR 1234 A" required />
         </div>
 
         <div class="fg full">
-          <label for="salesSpecialist">Sales Specialist <span class="req">*</span></label>
+          <label for="salesSpecialist">Sales Specialist <span class="req" id="saReq">*</span></label>
           <select id="salesSpecialist" required>
             <option value="" disabled selected>Select sales specialist</option>
             <option value="Michelle Ann Anak Charles">Michelle Ann Anak Charles</option>
@@ -317,12 +322,12 @@
       <div class="grid">
 
         <div class="fg">
-          <label for="name">Name <span class="req">*</span></label>
+          <label for="name">Name <span class="req" id="nameReq">*</span></label>
           <input id="name" type="text" placeholder="Full name" required />
         </div>
 
         <div class="fg">
-          <label for="phone">Phone <span class="req">*</span></label>
+          <label for="phone">Phone <span class="req" id="phoneReq">*</span></label>
           <input id="phone" type="tel" placeholder="e.g. 0123456789" required />
         </div>
 
@@ -370,7 +375,7 @@
       <!-- NOTES -->
       <div class="sec">Notes</div>
       <div class="fg">
-        <label for="notes">Purpose / Notes</label>
+        <label for="notes">Purpose / Notes <span class="req" id="notesReq" style="display:none;">*</span></label>
         <textarea id="notes" placeholder="e.g. customer requested short city route, staff demo run…"></textarea>
       </div>
 
@@ -406,12 +411,38 @@
   let selectedFile   = null;
   let licenceRequired = false;
 
-  // Show/hide required badge when usage type changes
-  document.getElementById('usageType').addEventListener('change', function() {
-    licenceRequired = this.value === 'Customer Test Drive';
-    licenceReqBadge.classList.toggle('show', licenceRequired);
-    // Clear any existing error state if file already uploaded
+  // ── Usage type rules ──
+  const saEl    = document.getElementById('salesSpecialist');
+  const nameEl  = document.getElementById('name');
+  const phoneEl = document.getElementById('phone');
+  const notesEl = document.getElementById('notes');
+
+  function applyUsageRules(val) {
+    const isInternal = val === 'Internal Use';
+    const isCustomer = val === 'Customer Test Drive';
+
+    // Sales Specialist
+    saEl.required = !isInternal;
+    document.getElementById('saReq').style.display = isInternal ? 'none' : '';
+
+    // Name & Phone
+    nameEl.required  = !isInternal;
+    phoneEl.required = !isInternal;
+    document.getElementById('nameReq').style.display  = isInternal ? 'none' : '';
+    document.getElementById('phoneReq').style.display = isInternal ? 'none' : '';
+
+    // Notes required for Internal Use
+    notesEl.required = isInternal;
+    document.getElementById('notesReq').style.display = isInternal ? '' : 'none';
+
+    // Licence required for Customer Test Drive
+    licenceRequired = isCustomer;
+    licenceReqBadge.classList.toggle('show', isCustomer);
     if (selectedFile) uploadZone.classList.remove('required-error');
+  }
+
+  document.getElementById('usageType').addEventListener('change', function() {
+    applyUsageRules(this.value);
   });
 
   function showPreview(file) {
